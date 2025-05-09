@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  # 1  Wekan‑Datenbank -MongoDB
+  wekan-db:
+    image: mongo:6
+    restart: unless-stopped
+    command: ["mongod","--oplogSize","128"]
+    volumes:
+      - wekan_db_data:/data/db
+
+  # 2 Wekan‑App
+  wekan:
+    image: quay.io/wekan/wekan:latest
+    restart: unless-stopped
+    depends_on:
+      - wekan-db
+    # Wichtig: interner Port für Traefik sichtbar machen
+    expose:
+      - "8080"
+    environment:
+      # Offizielles Wekan‑Compose nutzt MONGO_URL & ROOT_URL :contentReference[oaicite:9]{index=9}
+      - MONGO_URL=mongodb://wekan-db:27017/wekan
+      - ROOT_URL=https://${WEKAN_HOST}
+      - WITH_API=true
+    labels:
+      - traefik.enable=true
+
+      # HTTP‑Router - EntryPoint web- und Redirect zu HTTPS :contentReference[oaicite:10]{index=10}
+      - traefik.http.routers.wekan-http.rule=Host(`${WEKAN_HOST}`)
+      - traefik.http.routers.wekan-http.entrypoints=web
+      - traefik.http.routers.wekan-http.middlewares=redirect-to-https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      # HTTPS‑Router (EntryPoint websecure) mit TLS :contentReference[oaicite:11]{index=11}
+      - traefik.http.routers.wekan.rule=Host(`${WEKAN_HOST}`) && PathPrefix(`/`)
+      - traefik.http.routers.wekan.entrypoints=websecure
+      - traefik.http.routers.wekan.tls=true
+      - traefik.http.routers.wekan.tls.certresolver=le
+
+      # Interner Wekan‑Port
+      - traefik.http.services.wekan.loadbalancer.server.port=8080
+
+    volumes:
+      - wekan_files:/data
+
+volumes:
+  wekan_db_data:
+  wekan_files:
