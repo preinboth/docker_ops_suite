@@ -11,21 +11,26 @@ Dieses Repository enthält eine Docker-Konfiguration für Wekan, eine Open-Sourc
 ## Installation
 
 1. Repository klonen:
+
    ```bash
    git clone https://github.com/yourusername/docker_wekan.git
    cd docker_wekan
    ```
 
 2. Umgebungsvariablen konfigurieren:
+
    ```bash
    cp env.example .env
    ```
+
    Bearbeiten Sie die `.env`-Datei und setzen Sie Ihre Domain ein:
-   ```
+
+   ```bash
    WEKAN_HOST=wekan.ihredomain.com
    ```
 
 3. Container starten:
+
    ```bash
    docker-compose up -d
    ```
@@ -39,6 +44,7 @@ Dieses Repository enthält eine Docker-Konfiguration für Wekan, eine Open-Sourc
 ### Persistente Daten
 
 Die folgenden Daten werden in Docker-Volumes gespeichert:
+
 - `wekan_db_data`: MongoDB-Datenbank
 - `wekan_files`: Wekan-Uploads
 
