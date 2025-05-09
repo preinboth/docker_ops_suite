@@ -6,7 +6,6 @@
 
 - Automatisierungsskripte
 - Monitoring- und Reporting-Tools
-- interne CLI-Utilities
 - Konfigurationen und Templates
 - Hilfsdienste und Microservices
 
