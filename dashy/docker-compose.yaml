@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  dashy:
+    image: lissy93/dashy
+    container_name: dashy
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      NODE_ENV: production
+      UID: ${UID:-1000}
+      GID: ${GID:-1000}
+    volumes:
+      - dashy_data:/app/user-data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashy.rule=Host(`${DASHY_HOST}`)
+      - traefik.http.routers.dashy.entrypoints=websecure
+      - traefik.http.routers.dashy.tls=true
+      - traefik.http.routers.dashy.tls.certresolver=le
+      - traefik.http.services.dashy.loadbalancer.server.port=8080
+
+volumes:
+  dashy_data:
